@@ -1,4 +1,4 @@
 pid_servo
 =========
 
-a simple code for PID servo loops
+A simple code for PID servo loops. (in development)
