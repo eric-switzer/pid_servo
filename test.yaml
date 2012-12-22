@@ -1,0 +1,12 @@
+# servo configuration
+
+servos:
+  - name: ar1_servo 
+    desc: Detector array servo
+    channel: 0
+    p_term: ar1_servo_p
+
+  - name: ar2_servo 
+    desc: Detector array servo
+    channel: 0
+    p_term: ar1_servo_p

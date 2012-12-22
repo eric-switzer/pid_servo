@@ -1,0 +1,13 @@
+structure:
+the servo thread pushes its values to a circular buffer and pulls the current FIR value (at lower rate than push?)
+one block in YAML per servo: PID, sat, mem, active, channel, name, desc, default values
+
+initialize one circular buffer for each servo
+write the measured temperature with timestamp to file
+have servo thread pull filterd values, write those with timestamps
+implement FIR; coefs read from file
+compare in kst: is the servo seeing reasonable inputs?
+implement the servo driver
+thermal mass thread?
+redis thread to accept commands
+
