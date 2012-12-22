@@ -2,8 +2,6 @@ pid_servo
 =========
 A simple code for PID servo loops. (in development)
 
-redis passes commands to change the PID parameters or the setpoint.
-
 Hardware setup:
 ===============
 usb-1608FS reads the temperature using an AD590 read across a 9.8 kOhm resistor.
