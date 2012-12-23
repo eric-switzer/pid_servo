@@ -8,7 +8,10 @@
 #include "servo_temp.h"
 
 void servo_temp_init () {
-    printf("initializing servo thread\n");
+    printf("initializing servo thread; available temperatures\n");
+
+    list_temperatures();
+
     circ_buf_init(&temperature_buf, sizeof(double), TEMPERATURE_BUFLEN);
 }
 

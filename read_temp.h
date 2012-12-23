@@ -15,6 +15,7 @@ typedef struct temperature_entry_t {
 void add_temperature(const char *name, double val);
 double get_temperature(const char *name);
 void set_temperature(const char *name, double val);
+void list_temperatures();
 
 // main readout functions
 //-----------------------------------------------------------------------------

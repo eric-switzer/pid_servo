@@ -48,6 +48,16 @@ void set_temperature(const char *name, double val) {
     return;
 }
 
+void list_temperatures() {
+    struct temperature_entry_t *s, *tmp;
+
+    HASH_ITER(hh, temperature_entries, s, tmp) {
+        printf("%s: %10.5g\n", s->key, s->val);
+    }
+
+    return;
+}
+
 // open the device and build the calibration table
 void read_temp_init () {
     printf("initializing read thread\n");
