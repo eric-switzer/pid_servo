@@ -2,6 +2,8 @@ pid_servo
 =========
 A simple code for PID servo loops. (in development)
 
+get: libyaml-dev
+
 Hardware setup:
 ===============
 usb-1608FS reads the temperature using an AD590 read across a 9.8 kOhm resistor.
