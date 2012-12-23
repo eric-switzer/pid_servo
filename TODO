@@ -2,10 +2,8 @@ structure:
 the servo thread pushes its values to a circular buffer and pulls the current FIR value (at lower rate than push?)
 one block in YAML per servo: PID, sat, mem, active, channel, name, desc, default values
 
-make version that compiles again
 implement basic redis functionality
 initialize the redis thread last: it goes through the list of parameter keys and pulls current values from the server (init step)
-move the circular buffers into the read thread dict! (filter applies to all read samples then)
 parse the YAML servo specification file: initialize circular buffers, filter coefficients, name, etc.
 implement redis thread that pushes sub values to a PID param dict
 print the PID values in the current servo thread
