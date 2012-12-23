@@ -24,25 +24,14 @@ void add_temperature(const char *name, double val) {
 
 double get_temperature(const char *name) {
     HASH_FIND_STR(temperature_entries, name, temperature_entry);
-    if (temperature_entry) {
-        printf("returning %s (param_val %10.5g)\n",
-               temperature_entry->key, temperature_entry->val);
-    } else {
-        printf("failed to find %s\n", name);
-    }
+    if (!temperature_entry) printf("failed to find %s\n", name);
 
     return temperature_entry->val;
 }
 
 void set_temperature(const char *name, double val) {
     HASH_FIND_STR(temperature_entries, name, temperature_entry);
-    if (temperature_entry) {
-        printf("setting %s (param_val %10.5g -> %10.5g)\n",
-               temperature_entry->key, temperature_entry->val, val);
-
-    } else {
-        printf("failed to find %s\n", name);
-    }
+    if (!temperature_entry) printf("failed to find %s\n", name);
 
     temperature_entry->val = val;
     return;
@@ -66,7 +55,6 @@ void read_temp_init () {
     add_temperature("detector1", 0.);
     add_temperature("detector2", 0.);
     add_temperature("detector3", 0.);
-
 }
 
 void *read_temp_thread(void *arg) {

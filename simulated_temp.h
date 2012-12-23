@@ -5,6 +5,8 @@ double current_power;
 double current_temperature;
 double current_reading;
 
+#define SIMTEMPTHREAD_OUTPUT "temp_simulation.dat"
+
 void simulate_temp_init();
 void *simulate_temp_thread(void *arg);
 
