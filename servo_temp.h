@@ -5,6 +5,7 @@
 struct circ_buf_t temperature_buf;
 #define TEMPERATURE_BUFLEN 1000
 
+#define SERVOTHREAD_OUTPUT "servothread.dat"
 void servo_temp_init();
 void *servo_temp_thread(void *arg);
 

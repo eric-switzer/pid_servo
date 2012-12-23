@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 #include "uthash.h"
 
-# define TEMP_ENTRY_KEY_LEN 256
+#define TEMP_ENTRY_KEY_LEN 256
 typedef struct temperature_entry_t {
     char key[TEMP_ENTRY_KEY_LEN];
     double val;
@@ -19,6 +19,7 @@ void set_temperature(const char *name, double val);
 // main readout functions
 //-----------------------------------------------------------------------------
 
+#define READTHREAD_OUTPUT "readthread.dat"
 void read_temp_init();
 void *read_temp_thread(void *arg);
 

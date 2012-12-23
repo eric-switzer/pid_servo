@@ -2,9 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include "simulated_temp.h"
 #include "read_temp.h"
 
+// define the shared temperature hash
+//-----------------------------------------------------------------------------
 temperature_entry_t *temperature_entries=NULL, *temperature_entry;
 
 void add_temperature(const char *name, double val) {
@@ -57,8 +60,16 @@ void read_temp_init () {
 }
 
 void *read_temp_thread(void *arg) {
+    FILE *outfile;
+    outfile=fopen(READTHREAD_OUTPUT, "w");
+    struct timeval tv;
+
     while (1) {
-        usleep(10000);
+        gettimeofday(&tv,NULL);
         set_temperature("detector1", current_reading);
+        fprintf(outfile, "%ld.%ld %10.5f\n", tv.tv_sec, tv.tv_usec, current_reading);
+        fflush(outfile);
+        usleep(10000);
     }
+    fclose(outfile);
 }
