@@ -52,3 +52,56 @@ void list_temperatures() {
     return;
 }
 
+//-----------------------------------------------------------------------------
+// define the shared servoparam hash
+//-----------------------------------------------------------------------------
+servoparam_entry_t *servoparam_entries=NULL, *servoparam_entry;
+
+void add_servoparam(const char *name, double val) {
+    if ( (servoparam_entry =
+         (servoparam_entry_t*)
+         malloc(sizeof(servoparam_entry_t))) == NULL) exit(-1);
+
+    strncpy(servoparam_entry->key, name, servoparam_ENTRY_KEY_LEN);
+    servoparam_entry->val = val;
+    HASH_ADD_STR(servoparam_entries, key, servoparam_entry);
+
+    return;
+}
+
+double get_servoparam(const char *name) {
+    HASH_FIND_STR(servoparam_entries, name, servoparam_entry);
+    if (servoparam_entry) {
+        printf("returning %s (param_val %10.5g)\n",
+               servoparam_entry->key, servoparam_entry->val);
+    } else {
+        printf("failed to find %s\n", name);
+    }
+
+    return servoparam_entry->val;
+}
+
+void set_servoparam(const char *name, double val) {
+    HASH_FIND_STR(servoparam_entries, name, servoparam_entry);
+    if (servoparam_entry) {
+        printf("setting %s (param_val %10.5g -> %10.5g)\n",
+               servoparam_entry->key, servoparam_entry->val, val);
+
+    } else {
+        printf("failed to find %s\n", name);
+    }
+
+    servoparam_entry->val = val;
+    return;
+}
+
+void list_servoparams() {
+    struct servoparam_entry_t *s, *tmp;
+
+    HASH_ITER(hh, servoparam_entries, s, tmp) {
+        printf("%s: %10.5g\n", s->key, s->val);
+    }
+
+    return;
+}
+

@@ -24,5 +24,21 @@ void push_temperature(const char *name, double val);
 
 void list_temperatures();
 
+// define the shared servoparam hash
+//-----------------------------------------------------------------------------
+#include "uthash.h"
+
+#define servoparam_ENTRY_KEY_LEN 256
+typedef struct servoparam_entry_t {
+    char key[servoparam_ENTRY_KEY_LEN];
+    double val;
+    UT_hash_handle hh;
+} servoparam_entry_t;
+
+void add_servoparam(const char *name, double val);
+double get_servoparam(const char *name);
+void set_servoparam(const char *name, double val);
+void list_servoparams();
+
 #endif
 
