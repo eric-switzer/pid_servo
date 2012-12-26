@@ -61,7 +61,7 @@ void *safe_realloc(const char *var_name, void *ptr, size_t size) {
   return ret;
 }
 
-// Allocate and initialise a circular buffer.
+// Allocate and initialize a circular buffer.
 //  size_element The size of each element in bytes.
 //  num The total number of elements desired in the buffer.
 // returns: A pointer to the newly-allocated buffer.
@@ -74,7 +74,7 @@ struct circ_buf_t *circ_buf_alloc_and_init(int size_element, int num) {
   return cb;
 }
 
-// Initialise a circular buffer.
+// Initialize a circular buffer.
 //  size_element The size of each element in bytes.
 //  num The total number of elements desired in the buffer.
 void circ_buf_init(struct circ_buf_t *cb, int size_element, int num) {
@@ -177,7 +177,7 @@ char circ_buf_empty(struct circ_buf_t *cb) {
     return 0;
 }
 
-// Add an element to a circular buffer.  Copies with memcpy().
+// Add an element to a circular buffer. Copies with memcpy().
 //  val The value to add.
 void circ_buf_push_ptr(struct circ_buf_t *cb, const void *val) {
   void *new_pos;
@@ -191,7 +191,7 @@ void circ_buf_push_ptr(struct circ_buf_t *cb, const void *val) {
   cb->wpos = new_pos;
 }
 
-// Get pointer to the oldest un-read element from a circular buffer.  No
+// Get pointer to the oldest un-read element from a circular buffer. No
 // memcpy().
 // returns: (Pointer to) the oldest un-read value from the buffer, or NULL if
 //         there are no new data.
@@ -227,7 +227,7 @@ void *circ_buf_peek_ptr(struct circ_buf_t *cb) {
 // Read an element from a circular buffer.
 //
 //  history_index The index of the element to read, where 0 is the most
-//                      recent.  If larger than circ_buf_len(), the program
+//                      recent. If larger than circ_buf_len(), the program
 //                      will terminate.
 //
 // returns: The requested value.

@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include "simulated_temp.h"
-#include "read_temp.h"
+#include "servo_data.h"
 #include "servo_temp.h"
 
 void servo_temp_init () {

@@ -1,9 +1,14 @@
 structure:
 the servo thread pushes its values to a circular buffer and pulls the current FIR value (at lower rate than push?)
 one block in YAML per servo: PID, sat, mem, active, channel, name, desc, default values
+the command thread accepts variables from redis pub/sub (blocking) -> parameter dictionary
+the command ack thread is a separate connection to redis that replies to acknowledge a command
+the servo thread accesses the readout and servo parameters circular buffers and sets the actuator level
 
+move all the read thread dict functions to the servo (less invasive to existing read threads)
+move all servo command dict functions to the servo (not redis command)
+check access to bors
 implement basic redis functionality
-initialize the redis thread last: it goes through the list of parameter keys and pulls current values from the server (init step)
 parse the YAML servo specification file: initialize circular buffers, filter coefficients, name, etc.
 implement redis thread that pushes sub values to a PID param dict
 print the PID values in the current servo thread
