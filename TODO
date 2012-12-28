@@ -1,13 +1,38 @@
-structure:
-the servo thread pushes its values to a circular buffer and pulls the current FIR value (at lower rate than push?)
-one block in YAML per servo: PID, sat, mem, active, channel, name, desc, default values
-the command thread accepts variables from redis pub/sub (blocking) -> parameter dictionary
-the command ack thread is a separate connection to redis that replies to acknowledge a command
-the servo thread accesses the readout and servo parameters circular buffers and sets the actuator level
+make branch with old model
+clear out dicts from main branch
+look at code to specify old servos
+implement this in new code
+check that everything still works
 
-move all the read thread dict functions to the servo (less invasive to existing read threads)
-move all servo command dict functions to the servo (not redis command)
-check access to bors
+Notes:
+message handler was previously in a separate thread; moved it to blocking redis sub thread
+
+old model:
+The servo is part of a larger command handling interface where parameters and commands can be dispatched to many possible systems.
+Here, a JSON file species the variable list (name, description, min, max, default).
+This file is converted into a struct available to any thread. The variable names are organized through an enum structure.
+Incoming commands (variable/value pairs) are dispatched to a threaded subsystem by the blocking redis subscriber message handler.
+These are pushed to a circular buffer in that subsystem, and handled there, including an ack reply to the redis server.
+problem: linkages to parameters in a thread need to be defined at compile-time
+
+other model:
+local parameter dictionary synched with redis; commands sent by variable name
+handler dispatches all commands to all subsystem threads, if the thread knows how to handle it, it does
+
+larger amcp:
+remove cmdnum from the JSON specification and struct files
+now that the control thread is no longer used; does it need to run/exist? does it do anything?
+
+servo specification is a struct; dict of these for each servo
+redis code has one thread?
+
+data needed to each servo
+  PID parameters + sat, mem
+  active, channel
+  name, desc, default values
+  filename pointing to FIR coefficients
+  array of FIR coefficients
+
 implement basic redis functionality
 parse the YAML servo specification file: initialize circular buffers, filter coefficients, name, etc.
 implement redis thread that pushes sub values to a PID param dict
@@ -16,4 +41,3 @@ implement FIR; coefs read from file
 compare in kst: is the servo seeing reasonable inputs?
 implement the servo driver
 thermal mass thread?
-
