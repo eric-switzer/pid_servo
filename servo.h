@@ -2,6 +2,10 @@
 #define SERVO_H
 
 #define SERVO_RESIDUAL_DEPTH    1000
+#define DRV_LOWER               0
+#define DRV_UPPER               4096
+
+#include "circular_buffer.h"
 
 struct filter_t {
   double *coef;
@@ -52,7 +56,7 @@ struct servo_t **servo;
 
 void servo_init();
 
-void init_servo(struct servo_t *ptr, const char *source, double *coef,
+void init_servo(struct servo_t *ptr, double *coef,
                 int set_idx, int p_idx, int i_idx, int d_idx, int sat_idx,
                 int mem_idx);
 

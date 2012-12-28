@@ -5,7 +5,6 @@
 #include "simulated_temp.h"
 #include "read_temp.h"
 #include "servo.h"
-#include "redis_control.h"
 
 int main(int argc, char *argv[]) {
   pthread_t read_loop, servo_loop, simulate_loop, redis_control_loop;
@@ -15,7 +14,7 @@ int main(int argc, char *argv[]) {
   servo_init();
   // initialize the redis thread last: it goes through the list of parameter
   // keys and pulls current values from the server
-  redis_control_init();
+  //redis_control_init();
 
   pthread_create(&simulate_loop, NULL, simulate_temp_thread, NULL);
   pthread_create(&read_loop, NULL, read_temp_thread, NULL);

@@ -9,11 +9,6 @@
 // open the device and build the calibration table
 void read_temp_init () {
     printf("initializing read thread\n");
-
-    // register temperatures used internally to amcp
-    add_temperature("detector1");
-    add_temperature("detector2");
-    add_temperature("detector3");
 }
 
 void *read_temp_thread(void *arg) {
@@ -23,7 +18,7 @@ void *read_temp_thread(void *arg) {
 
     while (1) {
         gettimeofday(&tv,NULL);
-        push_temperature("detector1", current_reading);
+        //push_temperature("detector1", current_reading);
         fprintf(outfile, "%ld.%ld %10.5f\n", tv.tv_sec, tv.tv_usec, current_reading);
         fflush(outfile);
         usleep(10000);

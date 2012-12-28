@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include "redis_control.h"
-#include "servo_data.h"
 
 // open the device and build the calibration table
 void redis_control_init () {

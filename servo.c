@@ -80,7 +80,7 @@ void do_driver_shutdown(double *param_val) {
 
 void do_servo(double *param_val) {
 #ifndef __NO_SERVO__
-  static int servo_pos = 1000;
+  int i, j;
   double residual, integral, derivative, output, max_atan;
 
   for (i = 0; i < num_servo; i++) {
