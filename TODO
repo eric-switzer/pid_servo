@@ -1,7 +1,4 @@
-make branch with old model
-clear out dicts from main branch
-look at code to specify old servos
-implement this in new code
+move control struct code here, add servo entries, control_strcut
 check that everything still works
 
 Notes:
@@ -22,6 +19,7 @@ handler dispatches all commands to all subsystem threads, if the thread knows ho
 larger amcp:
 remove cmdnum from the JSON specification and struct files
 now that the control thread is no longer used; does it need to run/exist? does it do anything?
+clean up anything not needed in master.json
 
 servo specification is a struct; dict of these for each servo
 redis code has one thread?

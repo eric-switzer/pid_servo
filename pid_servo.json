@@ -1,0 +1,254 @@
+{
+    "detector1_pid_setpoint": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "Detector1 temp. setpoint",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector1_pid_setpoint",
+        "type": "input_onoff",
+        "units": ""
+    },
+    "detector1_pid_pterm": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "Detector1 temp. pterm",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector1_pid_pterm",
+        "type": "input_onoff",
+        "units": ""
+    },
+    "detector1_pid_iterm": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "Detector1 temp. iterm",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector1_pid_iterm",
+        "type": "input_onoff",
+        "units": ""
+    },
+    "detector1_pid_dterm": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "Detector1 temp. dterm",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector1_pid_dterm",
+        "type": "input_onoff",
+        "units": ""
+    },
+    "detector1_pid_saturation": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "Detector1 temp. saturation",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector1_pid_saturation",
+        "type": "input_onoff",
+        "units": ""
+    },
+    "detector1_pid_memory": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "Detector1 temp. memory",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector1_pid_memory",
+        "type": "input_onoff",
+        "units": ""
+    },
+    "detector1_pid_active": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "Detector1 temp. active",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector1_pid_active",
+        "type": "input_onoff",
+        "units": ""
+    },
+    "detector2_pid_setpoint": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "detector2 temp. setpoint",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector2_pid_setpoint",
+        "type": "input_onoff",
+        "units": ""
+    },
+    "detector2_pid_pterm": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "detector2 temp. pterm",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector2_pid_pterm",
+        "type": "input_onoff",
+        "units": ""
+    },
+    "detector2_pid_iterm": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "detector2 temp. iterm",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector2_pid_iterm",
+        "type": "input_onoff",
+        "units": ""
+    },
+    "detector2_pid_dterm": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "detector2 temp. dterm",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector2_pid_dterm",
+        "type": "input_onoff",
+        "units": ""
+    },
+    "detector2_pid_saturation": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "detector2 temp. saturation",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector2_pid_saturation",
+        "type": "input_onoff",
+        "units": ""
+    },
+    "detector2_pid_memory": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "detector2 temp. memory",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector2_pid_memory",
+        "type": "input_onoff",
+        "units": ""
+    },
+    "detector2_pid_active": {
+        "system": "Camera",
+        "category": "Servos",
+        "confirm": 0,
+        "default_val": 0.0,
+        "desc": "detector2 temp. active",
+        "destination": "hkservo",
+        "displayorder": 1,
+        "edit_level": 0,
+        "hwid": 140,
+        "minmax": [
+            0.0,
+            1.0
+        ],
+        "short_name": "detector2_pid_active",
+        "type": "input_onoff",
+        "units": ""
+    }
+}

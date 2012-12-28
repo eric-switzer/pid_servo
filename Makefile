@@ -15,7 +15,10 @@ HEADERS     = uthash.h circular_buffer.h pmd.h usb-1208FS.h usb-1608FS.h \
 OBJS        = circular_buffer.o simulated_temp.o read_temp.o servo.o \
               control.o
 
-all: $(TARGET)
+all: control_struct $(TARGET)
+
+control_struct:
+	python make_c_structs.py
 
 $(TARGET): $(TARGETC) $(OBJS) $(HEADERS) Makefile $(LIB)
 	$(LINK) $(CCFLAGS) $(SERVO_FLAGS) -o $(TARGET) $(TARGETC) $(OBJS) $(LDFLAGS)
