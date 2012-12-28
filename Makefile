@@ -10,11 +10,10 @@ LDFLAGS     = -lhiredis -levent -lpthread -lm
 SERVO_FLAGS =
 
 HEADERS     = uthash.h circular_buffer.h pmd.h usb-1208FS.h usb-1608FS.h \
-              read_temp.h servo_temp.h simulated_temp.h redis_control.h \
-              servo_data.h
+              read_temp.h servo.h simulated_temp.h control.h
 
-OBJS        = circular_buffer.o simulated_temp.o read_temp.o servo_temp.o \
-              redis_control.o servo_data.o
+OBJS        = circular_buffer.o simulated_temp.o read_temp.o servo.o \
+              control.o
 
 all: $(TARGET)
 

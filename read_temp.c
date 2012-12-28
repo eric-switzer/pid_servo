@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include "simulated_temp.h"
-#include "servo_data.h"
 #include "read_temp.h"
 
 // open the device and build the calibration table
