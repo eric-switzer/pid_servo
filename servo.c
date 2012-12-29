@@ -161,7 +161,7 @@ double do_servo_stub() {
 }
 
 void *servo_thread(void *arg) {
-  double det1_now, det2_now, previous_value, pprev, val_now;
+  double det1_now, previous_value, pprev, val_now;
   double time_now;
 
   FILE *outfile;
@@ -178,7 +178,6 @@ void *servo_thread(void *arg) {
     det1_now = GET_SERVO_TEMP(srv_detector1_idx, 0);
     previous_value = GET_SERVO_TEMP(srv_detector1_idx, 1);
     pprev = GET_SERVO_TEMP(srv_detector1_idx, 2);
-    det2_now = GET_SERVO_TEMP(srv_detector2_idx, 0);
 
     val_now = do_servo_stub();
 
