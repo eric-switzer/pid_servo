@@ -126,3 +126,13 @@ void do_servo(double *param_val) {
   }
 #endif
 }
+
+void *servo_thread(void *arg) {
+  double temp_now;
+  while (1) {
+    temp_now = GET_SERVO_TEMP(0, 0);
+    printf("%10.15g\n", temp_now);
+    usleep(10000);
+  }
+}
+

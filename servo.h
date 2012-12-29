@@ -49,7 +49,11 @@ struct servo_t **servo;
   #define NULL_DEFINE(...)
 #endif
 
-#define GET_CONTROL(var_name) circ_buf_get(&var_name.buf, double, 0)
+#define GET_SERVO_TEMP(servo_id, lookback)\
+  circ_buf_get(&servo[servo_id]->filt.buf, double, lookback);
+
+#define PUSH_SERVO_TEMP(servo_id, val)\
+  circ_buf_push(&servo[servo_id]->filt.buf, val);
 
 #define ACTIVE     1
 #define INACTIVE   0
@@ -63,6 +67,8 @@ void init_servo(struct servo_t *ptr, double *coef,
 void do_servo_filter(int servo_index, double val);
 
 void do_servo(double *param_val);
+
+void *servo_thread(void *arg);
 
 #endif
 

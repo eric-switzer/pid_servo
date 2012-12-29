@@ -6,6 +6,8 @@
 #include "simulated_temp.h"
 #include "read_temp.h"
 
+#include "servo.h"
+
 // open the device and build the calibration table
 void read_temp_init () {
     printf("initializing read thread\n");
@@ -18,6 +20,8 @@ void *read_temp_thread(void *arg) {
 
     while (1) {
         gettimeofday(&tv,NULL);
+        //PUSH_SERVO_TEMP(0, 1.1);
+        //circ_buf_push(&servo[0]->filt.buf, 1.1);
         //push_temperature("detector1", current_reading);
         fprintf(outfile, "%ld.%ld %10.5f\n", tv.tv_sec, tv.tv_usec, current_reading);
         fflush(outfile);
