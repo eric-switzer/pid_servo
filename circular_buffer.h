@@ -1,15 +1,17 @@
 #ifndef CIRCBUF_H
 #define CIRCBUF_H
 
-//! A structure for defining a circular buffer and for keeping track of its
-//! state.
+void *safe_calloc(const char *var_name, size_t nmemb, size_t size);
+void *safe_malloc(const char *var_name, size_t size);
+void *safe_realloc(const char *var_name, void *ptr, size_t size);
+
 struct circ_buf_t {
-  void *start;      //!< The start of the buffer.
-  void *end;        //!< The end of the buffer.
-  void *wpos;       //!< The most recently written-to point in the buffer.
-  void *rpos;       //!< The last read-from point in the buffer.
-  int size;         //!< The size of each buffer element.
-  int len;          //!< The number of elements in the buffer.
+  void *start;      // start of the buffer.
+  void *end;        // end of the buffer.
+  void *wpos;       // most recently written-to point in the buffer.
+  void *rpos;       // last read-from point in the buffer.
+  int size;         // size of each buffer element.
+  int len;          // number of elements in the buffer.
 };
 struct circ_buf_t *circ_buf_alloc_and_init(int size_element, int num);
 void circ_buf_init(struct circ_buf_t *cb, int size_element, int num);
