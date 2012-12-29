@@ -7,25 +7,24 @@
 #include "read_temp.h"
 
 #include "servo.h"
+#include "servo_struct.h"
 
 // open the device and build the calibration table
 void read_temp_init () {
-    printf("initializing read thread\n");
+  printf("initializing read thread\n");
 }
 
 void *read_temp_thread(void *arg) {
-    FILE *outfile;
-    outfile=fopen(READTHREAD_OUTPUT, "w");
-    struct timeval tv;
+  FILE *outfile;
+  outfile=fopen(READTHREAD_OUTPUT, "w");
+  struct timeval tv;
 
-    while (1) {
-        gettimeofday(&tv,NULL);
-        //PUSH_SERVO_TEMP(0, 1.1);
-        //circ_buf_push(&servo[0]->filt.buf, 1.1);
-        //push_temperature("detector1", current_reading);
-        fprintf(outfile, "%ld.%ld %10.5f\n", tv.tv_sec, tv.tv_usec, current_reading);
-        fflush(outfile);
-        usleep(10000);
-    }
-    fclose(outfile);
+  while (1) {
+    gettimeofday(&tv,NULL);
+    PUSH_SERVO_TEMP(srv_detector1_idx, current_reading);
+    fprintf(outfile, "%ld.%ld %10.5f\n", tv.tv_sec, tv.tv_usec, current_reading);
+    fflush(outfile);
+    usleep(10000);
+  }
+  fclose(outfile);
 }

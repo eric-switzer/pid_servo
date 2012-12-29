@@ -16,4 +16,20 @@ SERVO_INIT(srv_detector1,            // variable name
            srv_detector1_sat_idx,    // residual saturation (limiting) term
            srv_detector1_mem_idx)    // integral memory term
 
+SERVO_INIT(srv_detector2,
+           boxcar_10,
+           srv_detector2_set_idx,
+           srv_detector2_p_idx,
+           srv_detector2_i_idx,
+           srv_detector2_d_idx,
+           srv_detector2_sat_idx,
+           srv_detector2_mem_idx)
+
+// register each servo in an enum
+enum servo_sys_idx_t {
+  srv_detector1_idx,
+  srv_detector2c_idx
+};
+
+
 #endif // __NO_SERVO__
