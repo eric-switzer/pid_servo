@@ -10,7 +10,8 @@ LDFLAGS     = -lhiredis -levent -lpthread -lm
 SERVO_FLAGS =
 
 HEADERS     = circular_buffer.h pmd.h usb-1208FS.h usb-1608FS.h \
-              read_temp.h servo.h simulated_temp.h control.h
+              read_temp.h servo.h simulated_temp.h control.h servo_struct.h \
+              control_struct.h
 
 OBJS        = circular_buffer.o simulated_temp.o read_temp.o servo.o \
               control.o

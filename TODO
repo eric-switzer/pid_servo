@@ -1,5 +1,3 @@
-check the filter by 0.1 0.2 etc and print multiplication
-check that everything still works
 
 Notes:
 message handler was previously in a separate thread; moved it to blocking redis sub thread

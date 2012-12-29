@@ -62,8 +62,9 @@ void do_servo_filter(int servo_index) {
   // FIR fiter of the buffer
   // 0 is the oldest and 1 is the newest
   filt_val = circ_buf_get(cb, double, 0) * servo[i]->filt.coef[circ_buf_len(cb) - 1];
-  for (j = 0; j < (circ_buf_len(cb) - 1); j++)
+  for (j = 0; j < (circ_buf_len(cb) - 1); j++) {
     filt_val += circ_buf_get(cb, double, j + 1) * servo[i]->filt.coef[j];
+  }
 
   servo[i]->filt.val = filt_val;
   //message(M_INFO, "%d %10.15f %10.15f", i, val, filt_val);
