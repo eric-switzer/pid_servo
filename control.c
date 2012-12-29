@@ -1,4 +1,3 @@
-#include <act_util.h>
 #include <fcntl.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -14,6 +13,7 @@
 #include <hiredis/async.h>
 #include <hiredis/adapters/libevent.h>
 
+#include "circular_buffer.h"
 #include "control_struct.h"
 #include "extern.h"
 #include "frame.h"
@@ -53,27 +53,20 @@ void control_init() {
   int i, j, n, index, bit;
   int push_default = 1;
 
-  // Allocate the arrays holding the values of the parameter values.
-  param_val_curr = (double *)act_malloc("param_val_curr", num_ctrl_cmd_param() *
-                                                          sizeof(double));
+  param_val_curr = (double *)safe_malloc("param_val_curr",
+                                       num_ctrl_cmd_param() * sizeof(double));
 
   if (cmd_change == NULL) {
-    cmd_change = (int *)act_calloc("cmd_change", num_ctrl_cmd_param(),
+    cmd_change = (int *)safe_calloc("cmd_change", num_ctrl_cmd_param(),
                                    sizeof(int));
   }
-  for (i = 0; i < num_ctrl_cmd_param(); i++) {
-    cmd_change[i] = 0;
-  }
 
-  if (amcp_change == NULL)
-    amcp_change = (int *)act_calloc("amcp_change", num_ctrl_cmd_param(),
+  if (amcp_change == NULL) {
+    amcp_change = (int *)safe_calloc("amcp_change", num_ctrl_cmd_param(),
                                     sizeof(int));
-  for (i = 0; i < num_ctrl_cmd_param(); i++) {
-    amcp_change[i] = 0;
   }
 
-  // Initialise the parameter values to their defaults, in case
-  // redis fails (fall to safe state)
+  // Initialize the parameter values to their defaults
   for (i = 0; i < num_ctrl_cmd_param(); i++) {
     param_val_curr[i] = ctrl_cmd_param[i].default_val;
   }
@@ -85,9 +78,9 @@ void control_init() {
   }
 
   if (push_default) {
-    message(M_START, "Writing default command values to the server.");
+    printf("Writing default command values to the server.\n");
   } else {
-    message(M_START, "Getting current command values.");
+    printf("Getting current command values.\n");
   }
 
   for (i = 0; i < num_ctrl_cmd_param(); i++) {
@@ -96,32 +89,33 @@ void control_init() {
                            ctrl_cmd_param[i].name,
                            ctrl_cmd_param[i].default_val);
 
-      message(M_START, "REDIS: set %s %10.15g returns %s",
-              ctrl_cmd_param[i].name,
-              ctrl_cmd_param[i].default_val,
-              reply->str);
+      printf("REDIS: set %s %10.15g returns %s\n",
+             ctrl_cmd_param[i].name,
+             ctrl_cmd_param[i].default_val,
+             reply->str);
 
       freeReplyObject(reply);
     } else {
       reply = redisCommand(redis, "GET %s", ctrl_cmd_param[i].name);
+
       if ( reply->type == REDIS_REPLY_ERROR ) {
-        message(M_WARN, "Error: %s\n", reply->str);
+        printf("Error: %s\n", reply->str);
       } else if ( reply->type != REDIS_REPLY_STRING ) {
-        message(M_WARN, "Unexpected type/no value: %d\n", reply->type);
+        printf("Unexpected type/no value: %d\n", reply->type);
       } else {
         sscanf(reply->str, "%lf", &param_val_curr[i]);
-        message(M_INFO, "Result for %s: %10.15g\n",
-                ctrl_cmd_param[i].name,
-                param_val_curr[i]);
+        printf("Result for %s: %10.15g\n",
+               ctrl_cmd_param[i].name,
+               param_val_curr[i]);
       }
       freeReplyObject(reply);
     }
   }
-  message(M_START, "Finished retrieving current command values.");
+  printf("Finished retrieving current command values.\n");
 
-  // Start the subscriber thread here? or in amcp.c
-  //pthread_create(&command_loop, NULL, command_thread, NULL);
+  return;
 }
+
 
 void message_handler(redisAsyncContext *c, void *reply, void *privdata) {
   redisReply *r = reply;
@@ -142,23 +136,23 @@ void message_handler(redisAsyncContext *c, void *reply, void *privdata) {
           if (cmdindex > 0) {
             param_val_curr[cmdindex] = cmdval;
             cmd_change[cmdindex] = 1;
-            message(M_INFO, "Received command %s (idx=%d) with value %g.\n",
+            printf("Received command %s (idx=%d) with value %g.\n",
                     ctrl_cmd_param[cmdindex].name,
                     cmdindex,
                     param_val_curr[cmdindex]);
 
             i = cmdindex;
           } else {
-            message(M_WARN, "Unknown system variable received: %s\n",
+            printf("Unknown system variable received: %s\n",
                     r->element[2]->str);
           }
         } else {
-          message(M_WARN, "Malformed command received: %s", r->element[2]->str);
+          printf("Malformed command received: %s\n", r->element[2]->str);
         }
       }
     }
     if (!strcmp(r->element[1]->str, "messages")) {
-      message(M_INFO, "received a log message: handle this?");
+      printf("received a log message: handle this?\n");
     }
   }
 
@@ -169,17 +163,17 @@ void *command_thread(void *arg) {
   signal(SIGPIPE, SIG_IGN);
   struct event_base *base = event_base_new();
 
-  message(M_INFO, "starting sub conn");
+  printf("starting sub conn\n");
   redisAsyncContext *c = redisAsyncConnect(REDIS_HOST, REDIS_HOST_PORT);
   if (c->err) {
-    message(M_FATAL, "REDIS not connected: %s", c->errstr);
+    printf("REDIS not connected: %s\n", c->errstr);
   }
 
-  message(M_INFO, "starting lib event");
+  printf("starting lib event\n");
   redisLibeventAttach(c, base);
-  message(M_INFO, "send subscribe");
+  printf("send subscribe\n");
   redisAsyncCommand(c, message_handler, NULL, "SUBSCRIBE housekeeping");
-  message(M_INFO, "dispatch handler");
+  printf("dispatch handler\n");
   event_base_dispatch(base);
   return 0;
 }
@@ -193,7 +187,7 @@ void *control_thread(void *arg) {
 
   redis = redisConnect(REDIS_HOST, REDIS_HOST_PORT);
   if (redis->err) {
-    message(M_FATAL, "Redis connection error: %s", redis->errstr);
+    printf("Redis connection error: %s\n", redis->errstr);
     exit(EXIT_FAILURE);
   }
 
@@ -224,7 +218,7 @@ void *control_thread(void *arg) {
                                ctrl_cmd_param[i].name);
           freeReplyObject(reply);
 
-          message(M_INFO, "Ack command: %s->%g.",
+          printf("Ack command: %s->%g.\n",
                  ctrl_cmd_param[i].name, param_val_curr[i]);
 
           // reset and also block a change by amcp if made at the same time
@@ -245,13 +239,13 @@ void *control_thread(void *arg) {
                                ctrl_cmd_param[i].name);
           freeReplyObject(reply);
 
-          message(M_INFO, "AMCP pushed %s->%g.",
+          printf("AMCP pushed %s->%g.\n",
                  ctrl_cmd_param[i].name, param_val_curr[i]);
 
         }
         // TODO: remove me
         //for (i = 0; i < num_ctrl_cmd_param(); i++) {
-        //  message(M_INFO, "VAL after : %d %d", i, cmd_change[i]);
+        //  printf("VAL after : %d %d", i, cmd_change[i]);
         //}
 
         // Only implement a command if its value changed, or if it was a
