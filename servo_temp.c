@@ -13,19 +13,10 @@ void servo_temp_init () {
 }
 
 void *servo_temp_thread(void *arg) {
-    double current_value, previous_value;
-    FILE *outfile;
-    outfile=fopen(SERVOTHREAD_OUTPUT, "w");
-    struct timeval tv;
 
     while (1) {
-        gettimeofday(&tv,NULL);
         current_value = get_temperature("detector1", 1);
         previous_value = get_temperature("detector1", 2);
-
-        fprintf(outfile, "%ld.%ld %10.5f %10.5f %10.5f\n",
-                         tv.tv_sec, tv.tv_usec,
-                         current_temperature, current_value, previous_value);
 
         fflush(outfile);
 

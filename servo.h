@@ -4,6 +4,7 @@
 #define SERVO_RESIDUAL_DEPTH    1000
 #define DRV_LOWER               0
 #define DRV_UPPER               4096
+#define SERVOTHREAD_OUTPUT      "servo.dat"
 
 #include "circular_buffer.h"
 

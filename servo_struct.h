@@ -28,7 +28,7 @@ SERVO_INIT(srv_detector2,
 // register each servo in an enum
 enum servo_sys_idx_t {
   srv_detector1_idx,
-  srv_detector2c_idx
+  srv_detector2_idx
 };
 
 

@@ -128,11 +128,26 @@ void do_servo(double *param_val) {
 }
 
 void *servo_thread(void *arg) {
-  double temp_now;
+  double det1_now, det2_now, previous_value;
+
+  FILE *outfile;
+  outfile=fopen(SERVOTHREAD_OUTPUT, "w");
+  struct timeval tv;
+
   while (1) {
-    temp_now = GET_SERVO_TEMP(srv_detector1_idx, 0);
-    printf("%10.15g\n", temp_now);
-    usleep(10000);
+    gettimeofday(&tv,NULL);
+    det1_now = GET_SERVO_TEMP(srv_detector1_idx, 0);
+    previous_value = GET_SERVO_TEMP(srv_detector1_idx, 1);
+    det2_now = GET_SERVO_TEMP(srv_detector2_idx, 0);
+
+    fprintf(outfile, "%ld.%ld %10.5f %10.5f %10.5f\n",
+                     tv.tv_sec, tv.tv_usec,
+                     det1_now, previous_value, det2_now);
+
+    fflush(outfile);
+    usleep(100000);
   }
+
+  fclose(outfile);
 }
 
