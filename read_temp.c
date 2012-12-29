@@ -17,18 +17,23 @@ void read_temp_init () {
 void *read_temp_thread(void *arg) {
   FILE *outfile;
   outfile=fopen(READTHREAD_OUTPUT, "w");
-  struct timeval tv;
-  double alt_temp;
+  struct timeval tv_now, tv_start;
+  double alt_temp, time_now;
+
+  gettimeofday(&tv_start,NULL);
 
   while (1) {
-    gettimeofday(&tv,NULL);
+    gettimeofday(&tv_now,NULL);
+    time_now = (double)(tv_now.tv_sec - tv_start.tv_sec);
+    time_now += ((double)(tv_now.tv_usec - tv_start.tv_usec))/1.e6;
+
     PUSH_SERVO_TEMP(srv_detector1_idx, current_reading);
 
     alt_temp = current_reading * 2.;
     PUSH_SERVO_TEMP(srv_detector2_idx, alt_temp);
 
-    fprintf(outfile, "%ld.%ld %10.5f %10.5f\n",
-            tv.tv_sec, tv.tv_usec, current_reading, alt_temp);
+    fprintf(outfile, "%10.15f %10.5f %10.5f\n",
+            time_now, current_reading, alt_temp);
 
     fflush(outfile);
     usleep(10000);

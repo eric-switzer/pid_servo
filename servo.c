@@ -51,18 +51,19 @@ void servo_init() {
   #undef SERVO_STRUCT_LIST
 }
 
-void do_servo_filter(int servo_index, double val) {
+void do_servo_filter(int servo_index) {
   int i, j;
   double filt_val;
   struct circ_buf_t *cb;
 
   i = servo_index;
   cb = &servo[i]->filt.buf;
-  circ_buf_push(cb, val);
 
   // FIR fiter of the buffer
-  for (j = 0, filt_val = 0; j < circ_buf_len(cb); j++)
-    filt_val += circ_buf_get(cb, double, j) * servo[i]->filt.coef[j];
+  // 0 is the oldest and 1 is the newest
+  filt_val = circ_buf_get(cb, double, 0) * servo[i]->filt.coef[circ_buf_len(cb) - 1];
+  for (j = 0; j < (circ_buf_len(cb) - 1); j++)
+    filt_val += circ_buf_get(cb, double, j + 1) * servo[i]->filt.coef[j];
 
   servo[i]->filt.val = filt_val;
   //message(M_INFO, "%d %10.15f %10.15f", i, val, filt_val);
@@ -85,7 +86,7 @@ void do_servo(double *param_val) {
 
   for (i = 0; i < num_servo; i++) {
     max_atan = 2 * param_val[servo[i]->pid.sat_idx] / M_PI;
-    residual = max_atan * atan((param_val[servo[i]->pid.set_idx] - 
+    residual = max_atan * atan((param_val[servo[i]->pid.set_idx] -
                                servo[i]->filt.val) / max_atan);
     circ_buf_push(&servo[i]->pid.resid, residual);
     for (j = 0, integral = 0; j < SERVO_RESIDUAL_DEPTH; j++) {
@@ -113,7 +114,7 @@ void do_servo(double *param_val) {
     }
     servo[i]->output = output;
     //message(M_INFO, "** %d %10.15f %10.15f %10.15f\n", i,
-    //                param_val[servo[i]->pid.set_idx], 
+    //                param_val[servo[i]->pid.set_idx],
     //                servo[i]->filt.val,
     //                servo[i]->output);
 
@@ -127,22 +128,62 @@ void do_servo(double *param_val) {
 #endif
 }
 
+double do_servo_stub() {
+  int i;
+  double residual, output;
+  double val_now = 0.;
+
+  for (i = 0; i < num_servo; i++) {
+    do_servo_filter(i);
+    residual = 0.;
+    circ_buf_push(&servo[i]->pid.resid, residual);
+
+    if (i==0) {
+      val_now = servo[i]->filt.val;
+    }
+
+    // if the temperature readout is malfunctioning (-1)
+    if(circ_buf_get(&servo[i]->filt.buf, double, 1)==-1) {
+      servo[i]->pid.dead = INACTIVE;
+      //message(M_WARN, "Servoing off of a dead channel");
+      output = DRV_LOWER;
+    } else {
+      // if a channel becomes live again, switch it back
+      servo[i]->pid.dead = ACTIVE;
+    }
+    servo[i]->output = output;
+
+    if((servo[i]->pid.active == ACTIVE) && (servo[i]->pid.dead != INACTIVE))
+      printf("setting value");
+
+  }
+  return val_now;
+}
+
 void *servo_thread(void *arg) {
-  double det1_now, det2_now, previous_value;
+  double det1_now, det2_now, previous_value, pprev, val_now;
+  double time_now;
 
   FILE *outfile;
   outfile=fopen(SERVOTHREAD_OUTPUT, "w");
-  struct timeval tv;
+  struct timeval tv_now, tv_start;
+
+  gettimeofday(&tv_start,NULL);
 
   while (1) {
-    gettimeofday(&tv,NULL);
+    gettimeofday(&tv_now,NULL);
+    time_now = (double)(tv_now.tv_sec - tv_start.tv_sec);
+    time_now += ((double)(tv_now.tv_usec - tv_start.tv_usec))/1.e6;
+
     det1_now = GET_SERVO_TEMP(srv_detector1_idx, 0);
     previous_value = GET_SERVO_TEMP(srv_detector1_idx, 1);
+    pprev = GET_SERVO_TEMP(srv_detector1_idx, 2);
     det2_now = GET_SERVO_TEMP(srv_detector2_idx, 0);
 
-    fprintf(outfile, "%ld.%ld %10.5f %10.5f %10.5f\n",
-                     tv.tv_sec, tv.tv_usec,
-                     det1_now, previous_value, det2_now);
+    val_now = do_servo_stub();
+
+    fprintf(outfile, "%10.15f %10.5f %10.5f %10.5f %10.5f\n",
+                     time_now, det1_now, previous_value, pprev, val_now);
 
     fflush(outfile);
     usleep(100000);
