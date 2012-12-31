@@ -6,8 +6,11 @@
 #define REDIS_HK_CHANNEL "housekeeping"
 #define REDIS_HK_ACK_CHANNEL "housekeeping_ack"
 
+#define FIELD_LEN 256
+#define UNITS_LEN 256
 #define CTRL_CMD_TYPE_LEN           32
 #define CTRL_CMD_SYS_LEN            32
+
 struct ctrl_cmd_param_t {
   char name[FIELD_LEN];
   char type[CTRL_CMD_TYPE_LEN];
@@ -18,6 +21,9 @@ struct ctrl_cmd_param_t {
   double default_val;
   int cmdnum;
 };
+
+#define END_OF_CTRL_CMD_PARAM       {"", "", "", "", -1, -1, -1, -1}
+#define END_OF_CTRL_SYS             ""
 
 void control_init();
 void *command_thread(void *arg);

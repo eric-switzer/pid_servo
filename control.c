@@ -15,10 +15,9 @@
 
 #include "circular_buffer.h"
 #include "control_struct.h"
-#include "extern.h"
-#include "frame.h"
 #include "servo.h"
 #include "control.h"
+#include "extern.h"
 
 int max_ctrl_cmd_rate;
 double *param_val_curr;
@@ -50,7 +49,7 @@ int ctrl_cmd_to_index(const char *field) {
 void control_init() {
   redisContext *redis;
   redisReply *reply;
-  int i, j, n, index, bit;
+  int i;
   int push_default = 1;
 
   param_val_curr = (double *)safe_malloc("param_val_curr",
@@ -119,7 +118,7 @@ void control_init() {
 
 void message_handler(redisAsyncContext *c, void *reply, void *privdata) {
   redisReply *r = reply;
-  int i, k, cmdindex;
+  int cmdindex;
   double cmdval;
   char *sp;
 
@@ -140,8 +139,6 @@ void message_handler(redisAsyncContext *c, void *reply, void *privdata) {
                     ctrl_cmd_param[cmdindex].name,
                     cmdindex,
                     param_val_curr[cmdindex]);
-
-            i = cmdindex;
           } else {
             printf("Unknown system variable received: %s\n",
                     r->element[2]->str);
@@ -169,18 +166,14 @@ void *command_thread(void *arg) {
     printf("REDIS not connected: %s\n", c->errstr);
   }
 
-  printf("starting lib event\n");
   redisLibeventAttach(c, base);
-  printf("send subscribe\n");
   redisAsyncCommand(c, message_handler, NULL, "SUBSCRIBE housekeeping");
-  printf("dispatch handler\n");
   event_base_dispatch(base);
   return 0;
 }
 
 void *control_thread(void *arg) {
-  char send_amcp_changes;
-  int i, last_frame_pos;
+  int i;
 
   redisContext *redis;
   redisReply *reply;
@@ -191,82 +184,51 @@ void *control_thread(void *arg) {
     exit(EXIT_FAILURE);
   }
 
-  // Run control loop at 400 Hz.
-  last_frame_pos = 0;
-  send_amcp_changes = 0;
   for (;;) {
-    if (last_frame_pos != get_frame_pos()) {
-      // Check to see if we should register changes amcp made (once per
-      // second).
-      if (last_frame_pos > get_frame_pos())
-        send_amcp_changes = 1;
+    for (i = 0; i < num_ctrl_cmd_param(); i++) {
+      if (cmd_change[i]) {
+        // Push the values of requested change values back to the server.
+        reply = redisCommand(redis, "SET %s %10.15g",
+                             ctrl_cmd_param[i].name,
+                             param_val_curr[i]);
+        freeReplyObject(reply);
 
-      // Do servoing.
-      //do_servo(param_val_curr);
+        reply = redisCommand(redis, "PUBLISH %s %s",
+                             REDIS_HK_ACK_CHANNEL,
+                             ctrl_cmd_param[i].name);
+        freeReplyObject(reply);
 
-      // Check to see if anything needs to be updated.
-      for (i = 0; i < num_ctrl_cmd_param(); i++) {
-        if (cmd_change[i]) {
-          // Push the values of requested change values back to the server.
-          reply = redisCommand(redis, "SET %s %10.15g",
-                               ctrl_cmd_param[i].name,
-                               param_val_curr[i]);
-          freeReplyObject(reply);
+        printf("Ack command: %s->%g.\n",
+               ctrl_cmd_param[i].name, param_val_curr[i]);
 
-          reply = redisCommand(redis, "PUBLISH %s %s",
-                               REDIS_HK_ACK_CHANNEL,
-                               ctrl_cmd_param[i].name);
-          freeReplyObject(reply);
-
-          printf("Ack command: %s->%g.\n",
-                 ctrl_cmd_param[i].name, param_val_curr[i]);
-
-          // reset and also block a change by amcp if made at the same time
-          if (amcp_change[i]) {
-            amcp_change[i] = 0;
-          }
-        } else if (amcp_change[i] && send_amcp_changes) {
-          // Every second (when send_amcp_changes = 1), send any changes not
-          // requested by the interface_server, but which have been changed by
-          // amcp (e.g., during autocycling).
-          reply = redisCommand(redis, "SET %s %10.15g",
-                               ctrl_cmd_param[i].name,
-                               param_val_curr[i]);
-          freeReplyObject(reply);
-
-          reply = redisCommand(redis, "PUBLISH %s %s",
-                               REDIS_HK_ACK_CHANNEL,
-                               ctrl_cmd_param[i].name);
-          freeReplyObject(reply);
-
-          printf("AMCP pushed %s->%g.\n",
-                 ctrl_cmd_param[i].name, param_val_curr[i]);
-
+        // reset and also block a change by amcp if made at the same time
+        if (amcp_change[i]) {
+          amcp_change[i] = 0;
         }
-        // TODO: remove me
-        //for (i = 0; i < num_ctrl_cmd_param(); i++) {
-        //  printf("VAL after : %d %d", i, cmd_change[i]);
-        //}
+      } else if (amcp_change[i]) {
+        reply = redisCommand(redis, "SET %s %10.15g",
+                             ctrl_cmd_param[i].name,
+                             param_val_curr[i]);
+        freeReplyObject(reply);
 
-        // Only implement a command if its value changed, or if it was a
-        // simple push-button request.
-        if (!cmd_change[i] && !amcp_change[i])
-          continue;
+        reply = redisCommand(redis, "PUBLISH %s %s",
+                             REDIS_HK_ACK_CHANNEL,
+                             ctrl_cmd_param[i].name);
+        freeReplyObject(reply);
 
-        // OLD logic to detect changes made by the servo; replaced with
-        // requirement to explicitly flag amcp_change
-        //if (param_val_new[i] != param_val_curr[i] && !cmd_change[i])
-        //  amcp_change[i] = 1;
+        printf("AMCP pushed %s->%g.\n",
+               ctrl_cmd_param[i].name, param_val_curr[i]);
 
-        // reset the command change flags now that the values are pushed
-        cmd_change[i] = 0;
-        amcp_change[i] = 0;
       }
 
-      last_frame_pos = get_frame_pos();
-      send_amcp_changes = 0;
-    } else {
-      usleep(1);
+      // Only implement a command if its value changed, or if it was a
+      // simple push-button request.
+      if (!cmd_change[i] && !amcp_change[i])
+          continue;
+
+      // reset the command change flags now that the values are pushed
+      cmd_change[i] = 0;
+      amcp_change[i] = 0;
     }
   }
 
