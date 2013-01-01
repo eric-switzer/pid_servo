@@ -6,7 +6,10 @@ TARGET      = pid_servo
 TARGETC     = pid_servo.c
 #LDFLAGS     = -lpthread -lm -lact_util -Llib/ -l2600 -levent -lhiredis -lnidaqmxbase
 #LDFLAGS     = -lpthread -lmccusb -lm -static -lconfig
-LDFLAGS     = -lhiredis -levent -lpthread -lm
+
+LDFLAGS     = -lhiredis -levent -lpthread -lm -lmccusb
+#LDFLAGS     = -lhiredis -levent -lpthread -lm
+
 SERVO_FLAGS =
 
 HEADERS     = circular_buffer.h pmd.h usb-1208FS.h usb-1608FS.h \
