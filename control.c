@@ -20,12 +20,20 @@
 #include "extern.h"
 
 int max_ctrl_cmd_rate;
-double *param_val_curr;
 // flag: external command received or servo request
 int *cmd_change = NULL;
 int *servo_change = NULL;
 
 void message_handler(redisAsyncContext *c, void *reply, void *privdata);
+
+static void handle_msg(char *string, int rc) {
+  if (rc) {
+    printf("Error on: %s, rc=%d",
+           string, rc);
+    exit(EXIT_FAILURE);
+  }
+  return;
+}
 
 int num_ctrl_cmd_param() {
   static int num = -1;
@@ -49,8 +57,11 @@ int ctrl_cmd_to_index(const char *field) {
 void control_init() {
   redisContext *redis;
   redisReply *reply;
-  int i;
+  int i, rc;
   int push_default = 1;
+
+  rc = pthread_rwlock_init(&params_rwlock, NULL);
+  handle_msg("pthread_rwlock_init()\n", rc);
 
   param_val_curr = (double *)safe_malloc("param_val_curr",
                                        num_ctrl_cmd_param() * sizeof(double));
@@ -118,7 +129,7 @@ void control_init() {
 
 void message_handler(redisAsyncContext *c, void *reply, void *privdata) {
   redisReply *r = reply;
-  int cmdindex;
+  int cmdindex, rc;
   double cmdval;
   char *sp;
 
@@ -133,12 +144,19 @@ void message_handler(redisAsyncContext *c, void *reply, void *privdata) {
           sscanf(sp, "%lf", &cmdval);
           cmdindex = ctrl_cmd_to_index(r->element[2]->str);
           if (cmdindex > 0) {
+            // acquire a write lock on the param variables
+            rc = pthread_rwlock_wrlock(&params_rwlock);
+            handle_msg("pthread_rwlock_wrlock()\n", rc);
+
             param_val_curr[cmdindex] = cmdval;
             cmd_change[cmdindex] = 1;
             printf("Received command %s (idx=%d) with value %g.\n",
                     ctrl_cmd_param[cmdindex].name,
                     cmdindex,
                     param_val_curr[cmdindex]);
+
+            rc = pthread_rwlock_unlock(&params_rwlock);
+            handle_msg("pthread_rwlock_unlock()\n", rc);
           } else {
             printf("Unknown system variable received: %s\n",
                     r->element[2]->str);
@@ -173,7 +191,7 @@ void *command_thread(void *arg) {
 }
 
 void *control_thread(void *arg) {
-  int i;
+  int i, rc;
 
   redisContext *redis;
   redisReply *reply;
@@ -185,6 +203,9 @@ void *control_thread(void *arg) {
   }
 
   for (;;) {
+    rc = pthread_rwlock_rdlock(&params_rwlock);
+    handle_msg("pthread_rwlock_rdlock()\n", rc);
+
     for (i = 0; i < num_ctrl_cmd_param(); i++) {
       if (cmd_change[i]) {
         // Push the values of requested change values back to the server.
@@ -230,6 +251,9 @@ void *control_thread(void *arg) {
       cmd_change[i] = 0;
       servo_change[i] = 0;
     }
+
+    rc = pthread_rwlock_unlock(&params_rwlock);
+    handle_msg("pthread_rwlock_unlock()\n", rc);
   }
 
   return NULL;

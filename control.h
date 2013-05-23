@@ -1,5 +1,6 @@
 #ifndef CONTROL_H
 #define CONTROL_H
+#include<pthread.h>
 
 #define REDIS_HOST "127.0.0.1"
 #define REDIS_HOST_PORT 6379
@@ -23,6 +24,10 @@ struct ctrl_cmd_param_t {
 
 #define END_OF_CTRL_CMD_PARAM       {"", "", "", "", -1, -1, -1}
 #define END_OF_CTRL_SYS             ""
+
+// current parameter values (globally available, thread locked)
+pthread_rwlock_t params_rwlock;
+double *param_val_curr;
 
 void control_init();
 void *command_thread(void *arg);
