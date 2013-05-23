@@ -44,3 +44,37 @@ void init_servo(struct servo_t *ptr, const char *source, double *coef,@
   servo[i]->pid.dead   = ACTIVE;
 }
 
+double do_servo_stub() {
+  int i;
+  double residual, output;
+  double val_now = 0.;
+
+  for (i = 0; i < num_servo; i++) {
+    printf("here %d %d\n", servo[i]->pid.active, servo[i]->pid.dead);
+    do_servo_filter(i);
+    residual = 0.;
+    circ_buf_push(&servo[i]->pid.resid, residual);
+
+    if (i==0) {
+      val_now = servo[i]->filt.val;
+    }
+
+    // if the temperature readout is malfunctioning (-1)
+    if(circ_buf_get(&servo[i]->filt.buf, double, 1)==-1) {
+      servo[i]->pid.dead = INACTIVE;
+      //message(M_WARN, "Servoing off of a dead channel");
+      output = DRV_LOWER;
+    } else {
+      // if a channel becomes live again, switch it back
+      servo[i]->pid.dead = ACTIVE;
+    }
+    servo[i]->output = output;
+
+    if((servo[i]->pid.active == ACTIVE) && (servo[i]->pid.dead != INACTIVE))
+      printf("setting value");
+
+  }
+  return val_now;
+}
+
+

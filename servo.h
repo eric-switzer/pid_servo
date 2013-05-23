@@ -68,7 +68,7 @@ void init_servo(struct servo_t *ptr, double *coef,
 
 void do_servo_filter(int servo_index);
 
-void do_servo(double *param_val);
+void do_servo();
 
 void *servo_thread(void *arg);
 

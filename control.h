@@ -28,6 +28,7 @@ struct ctrl_cmd_param_t {
 // current parameter values (globally available, thread locked)
 pthread_rwlock_t params_rwlock;
 double *param_val_curr;
+void handle_errmsg(char *string, int rc);
 
 void control_init();
 void *command_thread(void *arg);
