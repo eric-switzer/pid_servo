@@ -1,6 +1,7 @@
 #ifndef SERVO_H
 #define SERVO_H
 
+#define SERVO_LOOP_WAIT         1000000
 #define SERVO_RESIDUAL_DEPTH    1000
 #define DRV_LOWER               0
 #define DRV_UPPER               4096

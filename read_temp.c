@@ -57,7 +57,9 @@ void *read_temp_thread(void *arg) {
   struct timeval tv_now, tv_start;
   double time_now;
   float temp_value = 0.;
+#ifndef __NO_HARDWARE__
   signed short svalue;
+#endif
 
   gettimeofday(&tv_start,NULL);
 

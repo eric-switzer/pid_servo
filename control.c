@@ -21,9 +21,9 @@
 
 int max_ctrl_cmd_rate;
 double *param_val_curr;
-// flag: external command received or amcp request
+// flag: external command received or servo request
 int *cmd_change = NULL;
-int *amcp_change = NULL;
+int *servo_change = NULL;
 
 void message_handler(redisAsyncContext *c, void *reply, void *privdata);
 
@@ -60,8 +60,8 @@ void control_init() {
                                    sizeof(int));
   }
 
-  if (amcp_change == NULL) {
-    amcp_change = (int *)safe_calloc("amcp_change", num_ctrl_cmd_param(),
+  if (servo_change == NULL) {
+    servo_change = (int *)safe_calloc("servo_change", num_ctrl_cmd_param(),
                                     sizeof(int));
   }
 
@@ -201,11 +201,11 @@ void *control_thread(void *arg) {
         printf("Ack command: %s->%g.\n",
                ctrl_cmd_param[i].name, param_val_curr[i]);
 
-        // reset and also block a change by amcp if made at the same time
-        if (amcp_change[i]) {
-          amcp_change[i] = 0;
+        // reset and also block a change by servo if made at the same time
+        if (servo_change[i]) {
+          servo_change[i] = 0;
         }
-      } else if (amcp_change[i]) {
+      } else if (servo_change[i]) {
         reply = redisCommand(redis, "SET %s %10.15g",
                              ctrl_cmd_param[i].name,
                              param_val_curr[i]);
@@ -216,19 +216,19 @@ void *control_thread(void *arg) {
                              ctrl_cmd_param[i].name);
         freeReplyObject(reply);
 
-        printf("AMCP pushed %s->%g.\n",
+        printf("servo pushed %s->%g.\n",
                ctrl_cmd_param[i].name, param_val_curr[i]);
 
       }
 
       // Only implement a command if its value changed, or if it was a
       // simple push-button request.
-      if (!cmd_change[i] && !amcp_change[i])
+      if (!cmd_change[i] && !servo_change[i])
           continue;
 
       // reset the command change flags now that the values are pushed
       cmd_change[i] = 0;
-      amcp_change[i] = 0;
+      servo_change[i] = 0;
     }
   }
 

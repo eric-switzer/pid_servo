@@ -19,10 +19,9 @@ struct ctrl_cmd_param_t {
   double min;
   double max;
   double default_val;
-  int cmdnum;
 };
 
-#define END_OF_CTRL_CMD_PARAM       {"", "", "", "", -1, -1, -1, -1}
+#define END_OF_CTRL_CMD_PARAM       {"", "", "", "", -1, -1, -1}
 #define END_OF_CTRL_SYS             ""
 
 void control_init();

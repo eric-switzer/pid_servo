@@ -135,6 +135,7 @@ double do_servo_stub() {
   double val_now = 0.;
 
   for (i = 0; i < num_servo; i++) {
+    printf("here %d %d\n", servo[i]->pid.active, servo[i]->pid.dead);
     do_servo_filter(i);
     residual = 0.;
     circ_buf_push(&servo[i]->pid.resid, residual);
@@ -186,7 +187,7 @@ void *servo_thread(void *arg) {
                      time_now, det1_now, previous_value, pprev, val_now);
 
     fflush(outfile);
-    usleep(100000);
+    usleep(SERVO_LOOP_WAIT);
   }
 
   fclose(outfile);
