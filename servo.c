@@ -16,7 +16,7 @@
 #include "servo_struct.h"
 #undef SERVO_DECLARATION
 
-void init_servo(struct servo_t *ptr, double *coef,
+void init_servo(struct servo_t *ptr, double *coef, int active_idx,
                 int set_idx, int p_idx, int i_idx, int d_idx, int sat_idx,
                 int mem_idx) {
   int i, fir_len;
@@ -27,6 +27,7 @@ void init_servo(struct servo_t *ptr, double *coef,
   servo[i] = ptr;
 
   for (fir_len = 0; coef[fir_len]; fir_len++);
+
   servo[i]->filt.coef = coef;
 
   circ_buf_init(&servo[i]->filt.buf, sizeof(double), fir_len);
@@ -40,9 +41,9 @@ void init_servo(struct servo_t *ptr, double *coef,
   servo[i]->pid.d_idx = d_idx;
   servo[i]->pid.sat_idx = sat_idx;
   servo[i]->pid.mem_idx = mem_idx;
-  // assume by default that the servo is off, the the channel is not dead
-  servo[i]->pid.active = INACTIVE;
-  servo[i]->pid.dead   = ACTIVE;
+  servo[i]->pid.active_idx = active_idx;
+  // assume by default that the servo is off, the the channel is alive
+  servo[i]->pid.alive   = ACTIVE;
 }
 
 void servo_init() {
@@ -73,6 +74,7 @@ void do_servo_filter(int servo_index) {
 }
 
 // IMPORTANT TODO: update this to use proper locks, shared params; before use
+/* 
 void do_driver_shutdown() {
   int i;
 
@@ -81,7 +83,7 @@ void do_driver_shutdown() {
   }
 
   return;
-}
+} */
 
 void do_servo() {
 #ifndef __NO_SERVO__
@@ -93,7 +95,6 @@ void do_servo() {
 
   for (i = 0; i < num_servo; i++) {
     do_servo_filter(i);
-    printf("here %d %d %10.5g\n", servo[i]->pid.active, servo[i]->pid.dead, servo[i]->filt.val);
     max_atan = 2 * param_val_curr[servo[i]->pid.sat_idx] / M_PI;
     residual = max_atan * atan((param_val_curr[servo[i]->pid.set_idx] -
                                servo[i]->filt.val) / max_atan);
@@ -112,16 +113,16 @@ void do_servo() {
     output = output < DRV_LOWER ? DRV_LOWER : output;
     output = output > DRV_UPPER ? DRV_UPPER : output;
 
+    servo[i]->pid.alive = param_val_curr[servo[i]->pid.active_idx];
+
     // if the temperature readout is malfunctioning (-1)
     // or should this be                         1?!!!!!!
     if(circ_buf_get(&servo[i]->filt.buf, double, 0)==-1) {
-      servo[i]->pid.dead = INACTIVE;
+      servo[i]->pid.alive = INACTIVE;
       //message(M_WARN, "Servoing off of a dead channel");
       output = DRV_LOWER;
-    } else {
-      // if a channel becomes live again, switch it back
-      servo[i]->pid.dead = ACTIVE;
     }
+
     servo[i]->output = output;
     //message(M_INFO, "** %d %10.15f %10.15f %10.15f\n", i,
     //                param_val_curr[servo[i]->pid.set_idx],
@@ -132,8 +133,10 @@ void do_servo() {
     //do_driver_shutdown(param_val_curr);
 
     // TODO: MOVE THIS TO THE SERVO_THREAD, in own loop outside of lock
-    if((servo[i]->pid.active == ACTIVE) && (servo[i]->pid.dead != INACTIVE))
-      printf("setting value");
+    // Divide the simulated values by some factor ~4096
+    printf("here %d %10.5g %10.5g\n", servo[i]->pid.alive, servo[i]->filt.val, output);
+    //if((servo[i]->pid.active == ACTIVE) && (servo[i]->pid.alive != INACTIVE))
+    //  printf("setting value");
 
   }
 

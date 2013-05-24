@@ -56,7 +56,7 @@ void *read_temp_thread(void *arg) {
   outfile=fopen(READTHREAD_OUTPUT, "w");
   struct timeval tv_now, tv_start;
   double time_now;
-  float temp_value = 0.;
+  double temp_value = 0.;
 #ifndef __NO_HARDWARE__
   signed short svalue;
 #endif
@@ -70,7 +70,7 @@ void *read_temp_thread(void *arg) {
 
 #ifndef __NO_HARDWARE__
     svalue = usbAIn_USB1608FS(fd[0], (__u8) TEMP_CHANNEL, BP_10_00V, table_AIN);
-    temp_value = volts_USB1608FS(BP_10_00V, svalue);
+    temp_value = (double)volts_USB1608FS(BP_10_00V, svalue);
 #else
     usleep(10000);
     temp_value = current_reading;
@@ -80,7 +80,7 @@ void *read_temp_thread(void *arg) {
     PUSH_SERVO_TEMP(srv_detector1_idx, temp_value);
 
     fprintf(outfile, "%10.15f %10.5f\n",
-            time_now, current_reading);
+            time_now, temp_value);
 
     fflush(outfile);
   }
