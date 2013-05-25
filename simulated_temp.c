@@ -4,6 +4,7 @@
 #include <math.h>
 #include <unistd.h>
 #include "simulated_temp.h"
+//#include <time.h>
 #include <sys/time.h>
 /*
 For a heater on a mass with capacity C and link G to bath T_b,
@@ -21,8 +22,9 @@ void simulate_temp_init()
 
 void *simulate_temp_thread(void *arg)
 {
-    FILE *outfile;
-    outfile = fopen(SIMTEMPTHREAD_OUTPUT, "w");
+    //FILE *outfile;
+    //outfile = fopen(SIMTEMPTHREAD_OUTPUT, "w");
+
     double time_now;
     double previous_temperature = BATH_TEMP;
     struct timeval tv_start, tv_now;
@@ -39,23 +41,23 @@ void *simulate_temp_thread(void *arg)
         previous_temperature = current_temperature;
 
         current_temperature = current_power / POWER_SCALE;
+
         current_temperature +=
             cos(time_now / 2. / M_PI) / POWER_SCALE / 1.;
+
         current_temperature -= previous_temperature - BATH_TEMP;
-        current_temperature *= RATE_COEF;
+        current_temperature *= (RATE_COEF) * (double) SIM_RATE;
         current_temperature += previous_temperature;
 
-        // simulate the measured temperature; could add noise here
         current_reading = current_temperature;
 
-        fprintf(outfile, "t=%10.15f P=%10.5f T=%10.5f Tm=%10.5f\n",
-                time_now, current_power, current_temperature,
-                current_reading);
+        //fprintf(outfile, "%10.15f %10.5f %10.5f %10.5f\n",
+        //        time_now, current_power, current_temperature,
+        //        current_reading);
+        //fflush(outfile);
 
-        fflush(outfile);
-
-        usleep(10000);
+        usleep(SIM_RATE);
     }
 
-    fclose(outfile);
+    //fclose(outfile);
 }

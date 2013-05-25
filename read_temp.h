@@ -5,4 +5,6 @@
 void read_temp_init();
 void *read_temp_thread(void *arg);
 
+#define READ_RATE 10000
+
 #endif

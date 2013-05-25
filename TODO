@@ -1,9 +1,14 @@
 why does viscacha not update after ack
-move ADC/DAC code to alternate versions
+inactive channels do not go to zero! (last value)
+put locks on any other vars
+convert from output power -> voltage -> 0-4096 (integer)
+in simulation loop, 0-4096 -> voltage -> power
+indent all code and recommit
 
 changes for AMCP:
 new category for destination within amcp
 mutex locking in control.c for parameter values
+IMPORTANT: cmdindex >= 0 NOT >0 in ctrl_cmd_param, prevented command 0 from being recognized
 
 Notes:
 message handler was previously in a separate thread; moved it to blocking redis sub thread

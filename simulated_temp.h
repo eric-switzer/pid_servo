@@ -10,7 +10,8 @@ double current_reading;
 void simulate_temp_init();
 void *simulate_temp_thread(void *arg);
 
-#define RATE_COEF (0.01)
+#define SIM_RATE  100
+#define RATE_COEF (1.e-6)
 #define BATH_TEMP (100.)
 #define POWER_SCALE (1.)
 

@@ -50,6 +50,7 @@ int ctrl_cmd_to_index(const char *field)
 {
     int i;
     for (i = 0; i < num_ctrl_cmd_param(); i++) {
+        printf("%d %s %s\n", i, field, ctrl_cmd_param[i].name);
         if (!strcmp(field, ctrl_cmd_param[i].name))
             return i;
     }
@@ -148,7 +149,7 @@ void message_handler(redisAsyncContext * c, void *reply, void *privdata)
                     *sp++ = '\0';
                     sscanf(sp, "%lf", &cmdval);
                     cmdindex = ctrl_cmd_to_index(r->element[2]->str);
-                    if (cmdindex > 0) {
+                    if (cmdindex >= 0) {
                         // acquire a write lock on the param variables
                         rc = pthread_rwlock_wrlock(&params_rwlock);
                         handle_errmsg("pthread_rwlock_wrlock()\n", rc);

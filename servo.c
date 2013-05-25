@@ -176,10 +176,12 @@ void *servo_thread(void *arg)
 
         if(servo[0]->pid.alive != INACTIVE) {
             current_power = val_now;
+        } esle {
+            current_power = DRV_LOWER;
         }
 
         fflush(outfile);
-        usleep(SERVO_LOOP_WAIT);
+        usleep(SERVO_RATE);
     }
 
     fclose(outfile);
