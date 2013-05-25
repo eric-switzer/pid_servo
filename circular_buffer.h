@@ -6,12 +6,12 @@ void *safe_malloc(const char *var_name, size_t size);
 void *safe_realloc(const char *var_name, void *ptr, size_t size);
 
 struct circ_buf_t {
-  void *start;      // start of the buffer.
-  void *end;        // end of the buffer.
-  void *wpos;       // most recently written-to point in the buffer.
-  void *rpos;       // last read-from point in the buffer.
-  int size;         // size of each buffer element.
-  int len;          // number of elements in the buffer.
+    void *start;                // start of the buffer.
+    void *end;                  // end of the buffer.
+    void *wpos;                 // most recently written-to point in the buffer.
+    void *rpos;                 // last read-from point in the buffer.
+    int size;                   // size of each buffer element.
+    int len;                    // number of elements in the buffer.
 };
 struct circ_buf_t *circ_buf_alloc_and_init(int size_element, int num);
 void circ_buf_init(struct circ_buf_t *cb, int size_element, int num);
@@ -32,4 +32,3 @@ char circ_buf_empty(struct circ_buf_t *cb);
 int circ_buf_len(struct circ_buf_t *cb);
 
 #endif
-

@@ -4,6 +4,7 @@
 #include <math.h>
 #include <unistd.h>
 #include "simulated_temp.h"
+#include "servo.h"
 //#include <time.h>
 #include <sys/time.h>
 /*
@@ -28,6 +29,7 @@ void *simulate_temp_thread(void *arg)
     double time_now;
     double previous_temperature = BATH_TEMP;
     struct timeval tv_start, tv_now;
+    double power;
 
     gettimeofday(&tv_start, NULL);
 
@@ -40,7 +42,11 @@ void *simulate_temp_thread(void *arg)
 
         previous_temperature = current_temperature;
 
-        current_temperature = current_power / POWER_SCALE;
+        power = current_controller / VOLTAGE_SCALE;
+        power *= power;
+        power /= RESISTANCE;
+
+        current_temperature = power / POWER_SCALE;
 
         current_temperature +=
             cos(time_now / 2. / M_PI) / POWER_SCALE / 1.;
@@ -52,7 +58,7 @@ void *simulate_temp_thread(void *arg)
         current_reading = current_temperature;
 
         //fprintf(outfile, "%10.15f %10.5f %10.5f %10.5f\n",
-        //        time_now, current_power, current_temperature,
+        //        time_now, current_controller, current_temperature,
         //        current_reading);
         //fflush(outfile);
 

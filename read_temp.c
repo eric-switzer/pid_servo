@@ -13,26 +13,26 @@
 
 double rand_normal(void)
 {
-   static double v, fac;
-   static int phase = 0;
-   double mag, rand_out, u;
+    static double v, fac;
+    static int phase = 0;
+    double mag, rand_out, u;
 
-   if (phase) {
-      rand_out = v * fac;
-   } else {
-      do {
-         u = 2. * (double)rand() / RAND_MAX - 1.;
-         v = 2. * (double)rand() / RAND_MAX - 1.;
-         mag = u * u + v * v;
-      } while(mag >= 1);
+    if (phase) {
+        rand_out = v * fac;
+    } else {
+        do {
+            u = 2. * (double) rand() / RAND_MAX - 1.;
+            v = 2. * (double) rand() / RAND_MAX - 1.;
+            mag = u * u + v * v;
+        } while (mag >= 1);
 
-      fac = sqrt (-2. * log(mag) / mag);
-      rand_out = u * fac;
-   }
+        fac = sqrt(-2. * log(mag) / mag);
+        rand_out = u * fac;
+    }
 
-   phase = 1 - phase;
+    phase = 1 - phase;
 
-   return rand_out;
+    return rand_out;
 }
 
 void read_temp_init()
@@ -62,7 +62,7 @@ void *read_temp_thread(void *arg)
         PUSH_SERVO_TEMP(srv_detector1_idx, temp_value);
 
         fprintf(outfile, "%10.15f %10.15g %10.15g %10.15g\n",
-                time_now, temp_value, current_reading, current_power);
+                time_now, temp_value, current_reading, current_controller);
 
         fflush(outfile);
     }

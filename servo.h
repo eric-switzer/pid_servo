@@ -3,35 +3,38 @@
 
 #define SERVO_RATE              10000
 #define SERVO_RESIDUAL_DEPTH    1000
+#define SERVOTHREAD_OUTPUT      "servo.dat"
+
 #define DRV_LOWER               0
 #define DRV_UPPER               4096
-#define SERVOTHREAD_OUTPUT      "servo.dat"
+#define RESISTANCE              (1.)
+#define VOLTAGE_SCALE           (410.)
 
 #include "circular_buffer.h"
 
 struct filter_t {
-  double *coef;
-  struct circ_buf_t buf;
-  double val;
+    double *coef;
+    struct circ_buf_t buf;
+    double val;
 };
 
 struct pid_servo_t {
-  struct circ_buf_t resid;
-  int active_idx;
-  int set_idx;
-  int p_idx;
-  int i_idx;
-  int d_idx;
-  int sat_idx;
-  int mem_idx;
-  int alive;
+    struct circ_buf_t resid;
+    int active_idx;
+    int set_idx;
+    int p_idx;
+    int i_idx;
+    int d_idx;
+    int sat_idx;
+    int mem_idx;
+    int alive;
 };
 
 struct servo_t {
-  double temp;
-  struct filter_t filt;
-  struct pid_servo_t pid;
-  double output;
+    double temp;
+    struct filter_t filt;
+    struct pid_servo_t pid;
+    double output;
 };
 
 int num_servo;
@@ -48,7 +51,7 @@ struct servo_t **servo;
              d_idx, sat_idx, mem_idx);
 
 #ifndef NULL_DEFINE
-  #define NULL_DEFINE(...)
+#define NULL_DEFINE(...)
 #endif
 
 #define GET_SERVO_TEMP(servo_id, lookback)\
@@ -76,20 +79,20 @@ void *servo_thread(void *arg);
 
 // This "environment" just declares the servo objects
 #ifdef SERVO_DECLARATION
-  #undef SERVO_INIT
-  #undef MAKE_FILTER_COEFF
-  #define SERVO_INIT SERVO_DECLARE
-  #define MAKE_FILTER_COEFF INIT_FILTER_COEFF
+#undef SERVO_INIT
+#undef MAKE_FILTER_COEFF
+#define SERVO_INIT SERVO_DECLARE
+#define MAKE_FILTER_COEFF INIT_FILTER_COEFF
 // Initialize the servo objects
 #elif defined SERVO_STRUCT_LIST
-  #undef SERVO_INIT
-  #undef MAKE_FILTER_COEFF
-  #define SERVO_INIT SERVO_LIST
-  #define MAKE_FILTER_COEFF NULL_DEFINE
+#undef SERVO_INIT
+#undef MAKE_FILTER_COEFF
+#define SERVO_INIT SERVO_LIST
+#define MAKE_FILTER_COEFF NULL_DEFINE
 // Do nothing with the servo structure
 #else
-  #undef SERVO_INIT
-  #undef MAKE_FILTER_COEFF
-  #define SERVO_INIT NULL_DEFINE
-  #define MAKE_FILTER_COEFF NULL_DEFINE
+#undef SERVO_INIT
+#undef MAKE_FILTER_COEFF
+#define SERVO_INIT NULL_DEFINE
+#define MAKE_FILTER_COEFF NULL_DEFINE
 #endif

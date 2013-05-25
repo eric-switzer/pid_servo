@@ -105,7 +105,8 @@ void do_servo()
     for (i = 0; i < num_servo; i++) {
         do_servo_filter(i);
 
-        residual = param_val_curr[servo[i]->pid.set_idx] - servo[i]->filt.val;
+        residual =
+            param_val_curr[servo[i]->pid.set_idx] - servo[i]->filt.val;
         saturation = param_val_curr[servo[i]->pid.sat_idx];
         residual = residual > saturation ? saturation : residual;
 
@@ -123,6 +124,9 @@ void do_servo()
             param_val_curr[servo[i]->pid.i_idx] * integral +
             param_val_curr[servo[i]->pid.d_idx] * derivative;
 
+        // convert to digital units
+        output = output < 0. ? 0. : output;
+        output = floor(VOLTAGE_SCALE * sqrt(output * RESISTANCE));
         output = output < DRV_LOWER ? DRV_LOWER : output;
         output = output > DRV_UPPER ? DRV_UPPER : output;
 
@@ -172,12 +176,13 @@ void *servo_thread(void *arg)
         val_now = servo[0]->output;
 
         fprintf(outfile, "%d %10.15f %10.5f %10.5f %10.5f %10.5f %10.5f\n",
-                servo[0]->pid.alive, time_now, det1_now, previous_value, pprev, val_now, servo[0]->filt.val);
+                servo[0]->pid.alive, time_now, det1_now, previous_value,
+                pprev, val_now, servo[0]->filt.val);
 
-        if(servo[0]->pid.alive != INACTIVE) {
-            current_power = val_now;
-        } esle {
-            current_power = DRV_LOWER;
+        if (servo[0]->pid.alive != INACTIVE) {
+            current_controller = val_now;
+        } else {
+            current_controller = DRV_LOWER;
         }
 
         fflush(outfile);

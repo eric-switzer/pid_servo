@@ -1,8 +1,5 @@
 why does viscacha not update after ack
-inactive channels do not go to zero! (last value)
 put locks on any other vars
-convert from output power -> voltage -> 0-4096 (integer)
-in simulation loop, 0-4096 -> voltage -> power
 indent all code and recommit
 
 changes for AMCP:

@@ -5,4 +5,3 @@
 extern struct ctrl_cmd_param_t ctrl_cmd_param[];
 
 #endif
-

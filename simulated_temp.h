@@ -1,7 +1,7 @@
 #ifndef SIMULATED_TEMP_H
 #define SIMULATED_TEMP_H
 
-double current_power;
+double current_controller;
 double current_temperature;
 double current_reading;
 

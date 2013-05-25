@@ -13,13 +13,13 @@
 #define CTRL_CMD_SYS_LEN            32
 
 struct ctrl_cmd_param_t {
-  char name[FIELD_LEN];
-  char type[CTRL_CMD_TYPE_LEN];
-  char sys[CTRL_CMD_SYS_LEN];
-  char units[UNITS_LEN];
-  double min;
-  double max;
-  double default_val;
+    char name[FIELD_LEN];
+    char type[CTRL_CMD_TYPE_LEN];
+    char sys[CTRL_CMD_SYS_LEN];
+    char units[UNITS_LEN];
+    double min;
+    double max;
+    double default_val;
 };
 
 #define END_OF_CTRL_CMD_PARAM       {"", "", "", "", -1, -1, -1}
