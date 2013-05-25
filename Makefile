@@ -36,4 +36,4 @@ again: clean all
 
 .PHONY: clean
 clean:
-	-rm -f *~ $(OBJS) $(TARGET) *.pyc control_struct.*
+	-rm -f *~ $(OBJS) $(TARGET) *.pyc control_struct.* *.dat

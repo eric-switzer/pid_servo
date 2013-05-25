@@ -1,20 +1,11 @@
 `pid_servo`
 ===========
-A simple code for PID servo loops. (in development)
+This is a C implementation of a PID control loop. The main code, `pid_servo` starts a read thread, a servo thread and simulation thread. The read thread can be replaced by code to read from data acquisition hardware. `read_hardware.c` is and example for reading a usb-1608FS ADC. The servo thread can have several systems controlled simultaneously, with parameters specified in the `servo_struct`. Commanding of the servo thread is done through `redis` and `control.c`. The PID parameters that can be commanded through this interface are in `pid_servo.json`, which is parsed into a `constrol_struct` through `master_config_parse.py`. The GUI `https://github.com/eric-switzer/viscacha` is convenient for issuing commands to the PID loop. The simulation thread here models a simple thermal system at fixed bath temperature. This can be replaced by a real thermal system with the mock-up described below.
 
-get: libyaml-dev?
+All of the threads are asynchronous. The read thread pushes values to a circular buffer. When the servo needs the current sensor value, it applies an FIR filter over the data in this buffer, and pulls off that value. The servo loop also keeps a circular buffer for its integral term that allows a finite (FIR) memory. The commanding thread acquires a lock to write to the servo parameter array. Depending on the implementation, other variables may need to be locked. The commanding thread can dispatch to other system threads (in addition to the servo).
 
-Components:
-===========
-* read thread: Reads the sensors and pushes control loop sensor values to a dictionary of circular buffers.
-* servo thread: The servo thread is asynchronous, and applies an FIR over the history in the circular buffer each time it needs to sample the current sensor value.
-* command thread: This accepts and acks commands through two redis connections. The command is received on a blocking subscriber connection and the ack thread publishes and sets the redis server value once that parameter has been set.
-* simulator thread: with no real hardware to interact with, this can be configured to test the servo behavior first.
-
-The overall design is meant to drop in easily to existing readout software
-
-Hardware setup:
-===============
+Mock temperature control hardware setup:
+=======================================
 usb-1608FS reads the temperature using an AD590 read across a 9.8 kOhm resistor.
 usb-1208FS applies its 0-4.1 V range to a 590 Ohm resistor glued to the AD590 giving 28 mW. The time constant is roughly one minute.
 
