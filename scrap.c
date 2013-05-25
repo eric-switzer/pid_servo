@@ -77,4 +77,8 @@ double do_servo_stub() {
   return val_now;
 }
 
+        /* max_atan = 2 * param_val_curr[servo[i]->pid.sat_idx] / M_PI;
+        residual = max_atan * atan((param_val_curr[servo[i]->pid.set_idx] -
+                                    servo[i]->filt.val) / max_atan); */
+
 

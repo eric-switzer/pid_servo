@@ -1,4 +1,9 @@
+why does viscacha not update after ack
+move ADC/DAC code to alternate versions
 
+changes for AMCP:
+new category for destination within amcp
+mutex locking in control.c for parameter values
 
 Notes:
 message handler was previously in a separate thread; moved it to blocking redis sub thread

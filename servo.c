@@ -11,6 +11,7 @@
 #include "control_struct.h"
 #include "control.h"
 #include "servo.h"
+#include "simulated_temp.h"
 
 #define SERVO_DECLARATION
 #include "servo_struct.h"
@@ -96,17 +97,20 @@ void do_servo()
 {
 #ifndef __NO_SERVO__
     int i, j, rc;
-    double residual, integral, derivative, output, max_atan;
+    double residual, integral, derivative, output, saturation;
 
     rc = pthread_rwlock_rdlock(&params_rwlock);
     handle_errmsg("pthread_rwlock_rdlock()\n", rc);
 
     for (i = 0; i < num_servo; i++) {
         do_servo_filter(i);
-        max_atan = 2 * param_val_curr[servo[i]->pid.sat_idx] / M_PI;
-        residual = max_atan * atan((param_val_curr[servo[i]->pid.set_idx] -
-                                    servo[i]->filt.val) / max_atan);
+
+        residual = param_val_curr[servo[i]->pid.set_idx] - servo[i]->filt.val;
+        saturation = param_val_curr[servo[i]->pid.sat_idx];
+        residual = residual > saturation ? saturation : residual;
+
         circ_buf_push(&servo[i]->pid.resid, residual);
+
         for (j = 0, integral = 0; j < SERVO_RESIDUAL_DEPTH; j++) {
             integral += circ_buf_get(&servo[i]->pid.resid, double, j) *
                 pow(param_val_curr[servo[i]->pid.mem_idx], (double) j);
@@ -128,25 +132,14 @@ void do_servo()
         // or should this be                         1?!!!!!!
         if (circ_buf_get(&servo[i]->filt.buf, double, 0) == -1) {
             servo[i]->pid.alive = INACTIVE;
-            //message(M_WARN, "Servoing off of a dead channel");
+            printf("Servo channel %d is dead\n", i);
             output = DRV_LOWER;
+            // implement this
+            //do_driver_shutdown(param_val_curr);
         }
 
         servo[i]->output = output;
-        //message(M_INFO, "** %d %10.15f %10.15f %10.15f\n", i,
-        //                param_val_curr[servo[i]->pid.set_idx],
-        //                servo[i]->filt.val,
-        //                servo[i]->output);
-
-        // implement this
-        //do_driver_shutdown(param_val_curr);
-
-        // TODO: MOVE THIS TO THE SERVO_THREAD, in own loop outside of lock
-        // Divide the simulated values by some factor ~4096
-        printf("here %d %10.5g %10.5g\n", servo[i]->pid.alive,
-               servo[i]->filt.val, output);
-        //if((servo[i]->pid.active == ACTIVE) && (servo[i]->pid.alive != INACTIVE))
-        //  printf("setting value");
+        printf("%10.15g %10.15g\n", residual, output);
 
     }
 
@@ -178,8 +171,12 @@ void *servo_thread(void *arg)
         do_servo();
         val_now = servo[0]->output;
 
-        fprintf(outfile, "%10.15f %10.5f %10.5f %10.5f %10.5f\n",
-                time_now, det1_now, previous_value, pprev, val_now);
+        fprintf(outfile, "%d %10.15f %10.5f %10.5f %10.5f %10.5f %10.5f\n",
+                servo[0]->pid.alive, time_now, det1_now, previous_value, pprev, val_now, servo[0]->filt.val);
+
+        if(servo[0]->pid.alive != INACTIVE) {
+            current_power = val_now / 4096.;
+        }
 
         fflush(outfile);
         usleep(SERVO_LOOP_WAIT);

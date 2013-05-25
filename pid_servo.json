@@ -11,7 +11,7 @@
         "edit_level": 0,
         "minmax": [
             0.0,
-            1.0
+            1000.0
         ],
         "short_name": "srv_detector1_set",
         "type": "input_value",
@@ -29,7 +29,7 @@
         "edit_level": 0,
         "minmax": [
             0.0,
-            1.0
+            1000.0
         ],
         "short_name": "srv_detector1_p",
         "type": "input_value",
@@ -47,7 +47,7 @@
         "edit_level": 0,
         "minmax": [
             0.0,
-            1.0
+            1000.0
         ],
         "short_name": "srv_detector1_i",
         "type": "input_value",
@@ -65,7 +65,7 @@
         "edit_level": 0,
         "minmax": [
             0.0,
-            1.0
+            1000.0
         ],
         "short_name": "srv_detector1_d",
         "type": "input_value",
@@ -83,7 +83,7 @@
         "edit_level": 0,
         "minmax": [
             0.0,
-            1.0
+            1000.0
         ],
         "short_name": "srv_detector1_sat",
         "type": "input_value",
@@ -101,7 +101,7 @@
         "edit_level": 0,
         "minmax": [
             0.0,
-            1.0
+            1000.0
         ],
         "short_name": "srv_detector1_mem",
         "type": "input_value",
