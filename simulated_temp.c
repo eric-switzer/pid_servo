@@ -29,10 +29,14 @@ void *simulate_temp_thread(void *arg)
 
     gettimeofday(&tv_start, NULL);
 
+    current_temperature = BATH_TEMP;
+
     while (1) {
         gettimeofday(&tv_now, NULL);
         time_now = (double) (tv_now.tv_sec - tv_start.tv_sec);
         time_now += ((double) (tv_now.tv_usec - tv_start.tv_usec)) / 1.e6;
+
+        previous_temperature = current_temperature;
 
         current_temperature = current_power / POWER_SCALE;
         current_temperature +=

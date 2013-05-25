@@ -139,7 +139,7 @@ void do_servo()
         }
 
         servo[i]->output = output;
-        printf("%10.15g %10.15g\n", residual, output);
+        //printf("%10.15g %10.15g\n", residual, output);
 
     }
 
@@ -175,7 +175,7 @@ void *servo_thread(void *arg)
                 servo[0]->pid.alive, time_now, det1_now, previous_value, pprev, val_now, servo[0]->filt.val);
 
         if(servo[0]->pid.alive != INACTIVE) {
-            current_power = val_now / 4096.;
+            current_power = val_now;
         }
 
         fflush(outfile);
