@@ -5,7 +5,7 @@
 #define REDIS_HOST "127.0.0.1"
 #define REDIS_HOST_PORT 6379
 #define REDIS_HK_CHANNEL "housekeeping"
-#define REDIS_HK_ACK_CHANNEL "housekeeping_ack"
+#define REDIS_HK_ACK_CHANNEL "commanding_ack"
 
 #define FIELD_LEN 256
 #define UNITS_LEN 256
