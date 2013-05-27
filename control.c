@@ -50,7 +50,6 @@ int ctrl_cmd_to_index(const char *field)
 {
     int i;
     for (i = 0; i < num_ctrl_cmd_param(); i++) {
-        printf("%d %s %s\n", i, field, ctrl_cmd_param[i].name);
         if (!strcmp(field, ctrl_cmd_param[i].name))
             return i;
     }
