@@ -41,7 +41,7 @@ def write_C_control_struct(locator):
     for key in db.keys():
         rec = db[key]
         if rec.has_key('system') and rec['sys_name'] in C_STRUCT_LIST:
-            structfile_c.write('  {\"' + rec['short_name'] +'\", ' \
+            structfile_c.write('  {\"' + key +'\", ' \
                                 + '\"' + rec['type'] +'\", ' \
                                 + '\"' + rec['sys_name'] + '\", ' \
                                 + '\"' + rec['units'] + '\", ' \
@@ -79,7 +79,7 @@ def write_C_control_struct(locator):
     for key in db.keys():
         rec = db[key]
         if rec.has_key('system') and rec['sys_name'] in C_STRUCT_LIST:
-            structfile_h.write('  ' + rec['short_name'] + '_idx,\n')
+            structfile_h.write('  ' + key + '_idx,\n')
 
     structfile_h.write('  ctrl_sys_param_idx_end_of_enum\n')
     structfile_h.write('};\n')
