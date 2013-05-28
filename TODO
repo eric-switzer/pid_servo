@@ -1,4 +1,3 @@
-why does viscacha not update after ack
 put locks on any other vars
 is servo_change used any more? (does the servo ever set values on redis?)
 
@@ -7,7 +6,4 @@ local dictionary synched to redis variables; commands to handler stacks on devic
 linkage of systems to variables specified at run-time, read from YAML/JSON file
 
 changes for AMCP:
-new category for destination within amcp
 mutex locking in control.c for parameter values
-IMPORTANT: cmdindex >= 0 NOT >0 in ctrl_cmd_param, prevented command 0 from being recognized
-clean up anything not needed in the json (cmdnum?)

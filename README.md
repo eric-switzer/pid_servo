@@ -4,6 +4,8 @@ This is a C implementation of a PID control loop. The main code, `pid_servo` sta
 
 All of the threads are asynchronous. The read thread pushes values to a circular buffer. When the servo needs the current sensor value, it applies an FIR filter over the data in this buffer, and pulls off that value. The servo loop also keeps a circular buffer for its integral term that allows a finite (FIR) memory. The commanding thread acquires a lock to write to the servo parameter array. Depending on the implementation, other variables may need to be locked. The commanding thread can dispatch to other system threads (in addition to the servo).
 
+Important note: set the timeout in `redis.conf` to 0. The commanding thread needs a persistent connection.
+
 Mock temperature control hardware setup:
 =======================================
 usb-1608FS reads the temperature using an AD590 read across a 9.8 kOhm resistor.
